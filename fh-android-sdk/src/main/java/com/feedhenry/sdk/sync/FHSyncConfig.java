@@ -152,9 +152,9 @@ public class FHSyncConfig {
     }
 
     /**
-     * Gets whether the sync client notifies on a remote updates applied event.
+     * Gets whether the sync client notifies on a remote update applied event.
      *
-     * @return whether a remote updates applied event will trigger a notification
+     * @return whether a remote update applied event will trigger a notification
      */
     public boolean isNotifyRemoteUpdateApplied() {
         return mNotifyRemoteUpdateApplied;

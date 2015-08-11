@@ -202,9 +202,9 @@ public class FHSyncDataset {
                         @Override
                         public void fail(FHResponse pResponse) {
                             /*
-                            The AJAX call failed to complete succesfully, so the state of the current pending updates is
-                            unknown. Mark them as "crashed". The next time a syncLoop completets successfully, we will
-                            review the crashed records to see if we can determine their current state.
+                            The AJAX call failed to complete successfully, so the state of the current pending updates
+                            is unknown. Mark them as "crashed". The next time a syncLoop completes successfully, we
+                            will review the crashed records to see if we can determine their current state.
                             */
                             markInFlightAsCrashed();
                             FHLog.e(
@@ -609,7 +609,7 @@ public class FHSyncDataset {
                 String crashedType = crashedUpdate.optString("type", null);
                 String crashedAction = crashedUpdate.optString("action", null);
                 if ("failed".equalsIgnoreCase(crashedType)) {
-                    // Crashed updated failed - revert local dataset
+                    // Crashed update failed - revert local dataset
                     if ("create".equalsIgnoreCase(crashedAction)) {
                         FHLog.d(
                             LOG_TAG,
