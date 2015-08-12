@@ -25,6 +25,9 @@
     <properties>
         <loopj.version>1.4.8</loopj.version>
         <aerogear.android.push.version>2.2.0</aerogear.android.push.version>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -78,7 +81,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <sourcepath>${basedir}/src</sourcepath>
+                    <sourcepath>${basedir}/src/java/com/feedhenry</sourcepath>
                     <sourceFileExcludes>
                         <exclude>
                             **com/google/**
