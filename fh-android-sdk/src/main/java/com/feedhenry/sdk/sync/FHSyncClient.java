@@ -11,13 +11,11 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
-
 import com.feedhenry.sdk.FH;
 import com.feedhenry.sdk.FHActCallback;
 import com.feedhenry.sdk.api.FHActRequest;
 import com.feedhenry.sdk.utils.FHLog;
-
-import org.json.fh.JSONObject;
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;

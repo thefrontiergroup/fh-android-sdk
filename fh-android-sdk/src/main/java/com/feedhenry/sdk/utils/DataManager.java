@@ -8,7 +8,7 @@ package com.feedhenry.sdk.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import org.json.fh.JSONObject;
+import org.json.JSONObject;
 
 /**
  * Internal class for managing data persistence.

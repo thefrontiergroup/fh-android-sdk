@@ -6,7 +6,7 @@
  */
 package com.feedhenry.sdk.sync;
 
-import org.json.fh.JSONObject;
+import org.json.JSONObject;
 
 public class FHSyncDataRecord {
 

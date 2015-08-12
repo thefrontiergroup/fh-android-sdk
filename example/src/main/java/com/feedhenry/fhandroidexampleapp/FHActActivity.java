@@ -5,8 +5,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import org.json.fh.JSONArray;
-import org.json.fh.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.feedhenry.sdk.FH;
 import com.feedhenry.sdk.FHActCallback;

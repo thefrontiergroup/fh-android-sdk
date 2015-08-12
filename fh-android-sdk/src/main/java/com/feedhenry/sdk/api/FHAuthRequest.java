@@ -13,8 +13,8 @@ import com.feedhenry.sdk.oauth.FHOAuthIntent;
 import com.feedhenry.sdk.oauth.FHOAuthWebView;
 import com.feedhenry.sdk.utils.FHLog;
 import org.apache.http.Header;
-import org.json.fh.JSONException;
-import org.json.fh.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.URLDecoder;
 import java.util.HashMap;

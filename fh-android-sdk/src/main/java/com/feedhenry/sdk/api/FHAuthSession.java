@@ -10,7 +10,7 @@ import com.feedhenry.sdk.*;
 import com.feedhenry.sdk.utils.DataManager;
 import com.feedhenry.sdk.utils.FHLog;
 import com.feedhenry.sdk.utils.StringUtils;
-import org.json.fh.JSONObject;
+import org.json.JSONObject;
 
 public class FHAuthSession {
     public static final String SESSION_TOKEN_KEY = "sessionToken";

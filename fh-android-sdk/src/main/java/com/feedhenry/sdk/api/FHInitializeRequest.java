@@ -11,7 +11,7 @@ import com.feedhenry.sdk.FH;
 import com.feedhenry.sdk.FHRemote;
 import com.feedhenry.sdk.utils.FHLog;
 import org.apache.http.Header;
-import org.json.fh.JSONObject;
+import org.json.JSONObject;
 
 /**
  * The request for calling the initialization function.

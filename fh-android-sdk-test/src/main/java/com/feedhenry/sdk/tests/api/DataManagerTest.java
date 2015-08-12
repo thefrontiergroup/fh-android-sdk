@@ -10,7 +10,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 import com.feedhenry.sdk.utils.DataManager;
-import org.json.fh.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DataManagerTest extends AndroidTestCase {
 
@@ -32,7 +33,7 @@ public class DataManagerTest extends AndroidTestCase {
         removeAll();
     }
 
-    public void testMigrateData() {
+    public void testMigrateData() throws JSONException {
         DataManager dm = DataManager.getInstance();
         String initData = dm.read("init");
         assertNull(initData);
@@ -59,7 +60,7 @@ public class DataManagerTest extends AndroidTestCase {
         assertNull(saved);
     }
 
-    private void createLegacyInitData() {
+    private void createLegacyInitData() throws JSONException {
         SharedPreferences prefs = getContext().getSharedPreferences("init", Context.MODE_PRIVATE);
         JSONObject initObj = new JSONObject().put("trackId", TRACKID);
         SharedPreferences.Editor edit = prefs.edit();

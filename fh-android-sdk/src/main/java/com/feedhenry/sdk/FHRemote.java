@@ -10,7 +10,7 @@ import android.content.Context;
 import com.feedhenry.sdk.utils.FHLog;
 import com.feedhenry.sdk.utils.StringUtils;
 import org.apache.http.Header;
-import org.json.fh.JSONObject;
+import org.json.JSONObject;
 
 /**
  * The base class that implements {@link FHAct}.
