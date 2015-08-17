@@ -51,8 +51,8 @@ package org.json.fh;
 public class CDL {
 
     /**
-     * Get the next value. The value can be wrapped in quotes. The value can
-     * be empty.
+     * Gets the next value.
+     * The value can be wrapped in quotes. The value can be empty.
      *
      * @param x A JSONTokener of the source text.
      * @return The value string, or null if empty.
@@ -60,15 +60,29 @@ public class CDL {
      */
     private static String getValue(JSONTokener x) throws JSONException {
         char c;
+        char q;
+        StringBuffer sb;
         do {
             c = x.next();
-        } while (c <= ' ' && c != 0);
+        } while (c == ' ' || c == '\t');
         switch (c) {
             case 0:
                 return null;
             case '"':
             case '\'':
-                return x.nextString(c);
+                q = c;
+                sb = new StringBuffer();
+                while (true) {
+                    c = x.next();
+                    if (c == q) {
+                        break;
+                    }
+                    if (c == 0 || c == '\n' || c == '\r') {
+                        throw x.syntaxError("Missing close quote '" + q + "'.");
+                    }
+                    sb.append(c);
+                }
+                return sb.toString();
             case ',':
                 x.back();
                 return "";
@@ -79,7 +93,7 @@ public class CDL {
     }
 
     /**
-     * Produce a JSONArray of strings from a row of comma delimited values.
+     * Produces a JSONArray of strings from a row of comma delimited values.
      *
      * @param x A JSONTokener of the source text.
      * @return A JSONArray of strings.
@@ -89,12 +103,12 @@ public class CDL {
         JSONArray ja = new JSONArray();
         while (true) {
             String value = getValue(x);
-            if (value == null) {
+            char c = x.next();
+            if (value == null || ja.length() == 0 && value.isEmpty() && c != ',') {
                 return null;
             }
             ja.put(value);
             while (true) {
-                char c = x.next();
                 if (c == ',') {
                     break;
                 }
@@ -102,16 +116,14 @@ public class CDL {
                     if (c == '\n' || c == '\r' || c == 0) {
                         return ja;
                     }
-                    throw x.syntaxError(
-                        "Bad character '" + c + "' (" +
-                            (int) c + ").");
+                    throw x.syntaxError("Bad character '" + c + "' (" + (int) c + ").");
                 }
             }
         }
     }
 
     /**
-     * Produce a JSONObject from a row of comma delimited text, using a
+     * Produces a JSONObject from a row of comma delimited text, using a
      * parallel JSONArray of strings to provides the names of the elements.
      *
      * @param names A JSONArray of names. This is commonly obtained from the
@@ -127,7 +139,7 @@ public class CDL {
     }
 
     /**
-     * Produce a JSONArray of JSONObjects from a comma delimited text string,
+     * Produces a JSONArray of JSONObjects from a comma delimited text string,
      * using the first row as a source of names.
      *
      * @param string The comma delimited text.
@@ -139,7 +151,7 @@ public class CDL {
     }
 
     /**
-     * Produce a JSONArray of JSONObjects from a comma delimited text string,
+     * Produces a JSONArray of JSONObjects from a comma delimited text string,
      * using the first row as a source of names.
      *
      * @param x The JSONTokener containing the comma delimited text.
@@ -151,7 +163,7 @@ public class CDL {
     }
 
     /**
-     * Produce a JSONArray of JSONObjects from a comma delimited text string
+     * Produces a JSONArray of JSONObjects from a comma delimited text string
      * using a supplied JSONArray as the source of element names.
      *
      * @param names  A JSONArray of strings.
@@ -164,7 +176,7 @@ public class CDL {
     }
 
     /**
-     * Produce a JSONArray of JSONObjects from a comma delimited text string
+     * Produces a JSONArray of JSONObjects from a comma delimited text string
      * using a supplied JSONArray as the source of element names.
      *
      * @param names A JSONArray of strings.
@@ -191,7 +203,7 @@ public class CDL {
     }
 
     /**
-     * Produce a comma delimited text row from a JSONArray. Values containing
+     * Produces a comma delimited text row from a JSONArray. Values containing
      * the comma character will be quoted.
      *
      * @param ja A JSONArray of strings.
@@ -206,16 +218,17 @@ public class CDL {
             Object o = ja.opt(i);
             if (o != null) {
                 String s = o.toString();
-                if (s.contains(",")) {
-                    if (s.contains("\"")) {
-                        sb.append('\'');
-                        sb.append(s);
-                        sb.append('\'');
-                    } else {
-                        sb.append('"');
-                        sb.append(s);
-                        sb.append('"');
+                if (!s.isEmpty() && s.contains(",") || s.contains("\n") || s.contains("\r") ||
+                    s.contains(Character.toString((char) 0)) || s.startsWith("\"")) {
+                    sb.append('"');
+                    int length = s.length();
+                    for (int j = 0; j < length; j++) {
+                        char c = s.charAt(j);
+                        if (c >= ' ' && c != '"') {
+                            sb.append(c);
+                        }
                     }
+                    sb.append('"');
                 } else {
                     sb.append(s);
                 }
@@ -226,7 +239,7 @@ public class CDL {
     }
 
     /**
-     * Produce a comma delimited text from a JSONArray of JSONObjects. The
+     * Produces a comma delimited text from a JSONArray of JSONObjects. The
      * first row will be a list of names obtained by inspecting the first
      * JSONObject.
      *
@@ -246,7 +259,7 @@ public class CDL {
     }
 
     /**
-     * Produce a comma delimited text from a JSONArray of JSONObjects using
+     * Produces a comma delimited text from a JSONArray of JSONObjects using
      * a provided list of names. The list of names is not included in the
      * output.
      *

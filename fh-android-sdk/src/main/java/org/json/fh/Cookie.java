@@ -86,18 +86,17 @@ public class Cookie {
      * @throws JSONException this will be thrown if there is an error parsing the JSON
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
-        String n;
         JSONObject o = new JSONObject();
-        Object v;
         JSONTokener x = new JSONTokener(string);
         o.put("name", x.nextTo('='));
         x.next('=');
         o.put("value", x.nextTo(';'));
         x.next();
         while (x.more()) {
-            n = unescape(x.nextTo("=;"));
+            Object v;
+            String name = unescape(x.nextTo("=;"));
             if (x.next() != '=') {
-                if (n.equals("secure")) {
+                if (name.equals("secure")) {
                     v = Boolean.TRUE;
                 } else {
                     throw x.syntaxError("Missing '=' in cookie parameter.");
@@ -106,7 +105,7 @@ public class Cookie {
                 v = unescape(x.nextTo(';'));
                 x.next();
             }
-            o.put(n, v);
+            o.put(name, v);
         }
         return o;
     }

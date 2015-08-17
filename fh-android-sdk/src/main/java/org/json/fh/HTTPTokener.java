@@ -40,7 +40,7 @@ package org.json.fh;
 public class HTTPTokener extends JSONTokener {
 
     /**
-     * Construct an XMLTokener from a string.
+     * Constructs an HTTPTokener from a string.
      *
      * @param s A source string.
      */
@@ -49,7 +49,8 @@ public class HTTPTokener extends JSONTokener {
     }
 
     /**
-     * Get the next token or string. This is used in parsing HTTP headers.
+     * Gets the next token or string.
+     * This is used in parsing HTTP headers.
      *
      * @return A String.
      * @throws JSONException this will be thrown if there is an error parsing the JSON

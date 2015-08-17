@@ -87,7 +87,7 @@ public class JSONWriter {
     /**
      * The object/array stack.
      */
-    private char stack[];
+    private final char[] stack;
 
     /**
      * The stack top index. A value of 0 indicates that the stack is empty.
@@ -169,9 +169,7 @@ public class JSONWriter {
      */
     private JSONWriter end(char m, char c) throws JSONException {
         if (this.mode != m) {
-            throw new JSONException(
-                m == 'o' ? "Misplaced endObject." :
-                    "Misplaced endArray.");
+            throw new JSONException(m == 'o' ? "Misplaced endObject." : "Misplaced endArray.");
         }
         this.pop(m);
         try {

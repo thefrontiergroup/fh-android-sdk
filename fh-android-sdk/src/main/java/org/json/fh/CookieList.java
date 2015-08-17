@@ -78,8 +78,8 @@ public class CookieList {
     public static String toString(JSONObject o) throws JSONException {
         boolean b = false;
         StringBuilder sb = new StringBuilder();
-        for (Iterator keys = o.keys(); keys.hasNext(); ) {
-            String s = keys.next().toString();
+        for (Iterator<String> keys = o.keys(); keys.hasNext(); ) {
+            String s = keys.next();
             if (!o.isNull(s)) {
                 if (b) {
                     sb.append(';');

@@ -33,7 +33,6 @@ package org.json.fh;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -99,6 +98,7 @@ public class JSONObject implements Serializable {
          *
          * @return NULL.
          */
+        @Override
         protected final Object clone() {
             return this;
         }
@@ -110,6 +110,7 @@ public class JSONObject implements Serializable {
          * @return true if the object parameter is the JSONObject.NULL object
          * or null.
          */
+        @Override
         public boolean equals(Object object) {
             return object == null || object == this;
         }
@@ -119,6 +120,7 @@ public class JSONObject implements Serializable {
          *
          * @return The string "null".
          */
+        @Override
         public String toString() {
             return "null";
         }
@@ -243,12 +245,10 @@ public class JSONObject implements Serializable {
      */
     public JSONObject(Object object, String names[]) {
         this();
-        Class c = object.getClass();
+        Class<?> c = object.getClass();
         for (String name : names) {
             try {
-                Field field = c.getField(name);
-                Object value = field.get(object);
-                this.put(name, value);
+                this.putOpt(name, c.getField(name).get(object));
             } catch (Exception e) {
                 /* forget about it */
             }
@@ -286,7 +286,7 @@ public class JSONObject implements Serializable {
         testValidity(value);
         Object o = opt(key);
         if (o == null) {
-            put(key, value);
+            put(key, value instanceof JSONArray ? new JSONArray().put(value) : value);
         } else if (o instanceof JSONArray) {
             ((JSONArray) o).put(value);
         } else {
@@ -533,7 +533,7 @@ public class JSONObject implements Serializable {
      * @return A String.
      * @throws JSONException if there is an error parsing the JSON If n is a non-finite number.
      */
-    static public String numberToString(Number n) throws JSONException {
+    public static String numberToString(Number n) throws JSONException {
         if (n == null) {
             throw new JSONException("Null pointer");
         }
@@ -596,7 +596,7 @@ public class JSONObject implements Serializable {
      * @return this.
      * @throws JSONException if there is an error parsing the JSON
      */
-    public JSONObject put(String key, Collection value) throws JSONException {
+    public JSONObject put(String key, Collection<Object> value) throws JSONException {
         put(key, new JSONArray(value));
         return this;
     }
@@ -929,12 +929,63 @@ public class JSONObject implements Serializable {
     }
 
     /**
+     * Try to convert a string into a number, boolean, or null. If the string
+     * can't be converted, return the string.
+     *
+     * @param string A String.
+     * @return A simple JSON value.
+     */
+    public static Object stringToValue(String string) {
+        Double d;
+        if (string.equals("")) {
+            return string;
+        }
+        if (string.equalsIgnoreCase("true")) {
+            return Boolean.TRUE;
+        }
+        if (string.equalsIgnoreCase("false")) {
+            return Boolean.FALSE;
+        }
+        if (string.equalsIgnoreCase("null")) {
+            return JSONObject.NULL;
+        }
+
+        /*
+         * If it might be a number, try converting it. If a number cannot be
+         * produced, then the value will just be a string.
+         */
+
+        char b = string.charAt(0);
+        if (b >= '0' && b <= '9' || b == '-') {
+            try {
+                if (string.contains(".") || string.contains("e") || string.contains("E")) {
+                    d = Double.valueOf(string);
+                    if (!d.isInfinite() && !d.isNaN()) {
+                        return d;
+                    }
+                } else {
+                    Long myLong = new Long(string);
+                    if (string.equals(myLong.toString())) {
+                        if (myLong == myLong.intValue()) {
+                            return myLong.intValue();
+                        } else {
+                            return myLong;
+                        }
+                    }
+                }
+            } catch (Exception ignore) {
+            }
+        }
+        return string;
+    }
+
+    /**
      * Throw an exception if the object is an NaN or infinite number.
      *
      * @param o The object to test.
      * @throws JSONException if there is an error parsing the JSON If o is a non-finite number.
      */
-    static void testValidity(Object o) throws JSONException {
+    public static void testValidity(Object o) throws JSONException {
         if (o != null) {
             if (o instanceof Double) {
                 if (((Double) o).isInfinite() || ((Double) o).isNaN()) {
@@ -981,6 +1032,7 @@ public class JSONObject implements Serializable {
      * with <code>{</code>&nbsp;<small>(left brace)</small> and ending
      * with <code>}</code>&nbsp;<small>(right brace)</small>.
      */
+    @Override
     public String toString() {
         try {
             StringBuilder sb = new StringBuilder("{");
@@ -1086,7 +1138,7 @@ public class JSONObject implements Serializable {
      * with <code>}</code>&nbsp;<small>(right brace)</small>.
      * @throws JSONException if there is an error parsing the JSON If the value is or contains an invalid number.
      */
-    static String valueToString(Object value) throws JSONException {
+    public static String valueToString(Object value) throws JSONException {
         if (value == null) {
             return "null";
         }
@@ -1100,13 +1152,21 @@ public class JSONObject implements Serializable {
             if (o instanceof String) {
                 return (String) o;
             }
-            throw new JSONException("Bad value from toJSONString: " + value);
+            throw new JSONException("Bad value from toJSONString: " + o);
         }
         if (value instanceof Number) {
             return numberToString((Number) value);
         }
         if (value instanceof Boolean || value instanceof JSONObject || value instanceof JSONArray) {
             return value.toString();
+        }
+        if (value instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) value;
+            return new JSONObject(map).toString();
+        }
+        if (value instanceof Collection) {
+            Collection<Object> coll = (Collection<Object>) value;
+            return new JSONArray(coll).toString();
         }
         return quote(value.toString());
     }
@@ -1195,6 +1255,7 @@ public class JSONObject implements Serializable {
         }
     }
 
+    @Override
     public boolean equals(Object pObject) {
         if (pObject == null) {
             return false;
