@@ -6,19 +6,30 @@
  */
 package com.feedhenry.sdk.api;
 
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import com.feedhenry.sdk.*;
+import com.feedhenry.sdk.AppProps;
+import com.feedhenry.sdk.CloudProps;
+import com.feedhenry.sdk.Device;
+import com.feedhenry.sdk.FH;
+import com.feedhenry.sdk.FHActCallback;
+import com.feedhenry.sdk.FHRemote;
+import com.feedhenry.sdk.FHResponse;
 import com.feedhenry.sdk.oauth.FHOAuthIntent;
 import com.feedhenry.sdk.oauth.FHOAuthWebView;
+import com.feedhenry.sdk.utils.DataManager;
 import com.feedhenry.sdk.utils.FHLog;
-import org.apache.http.Header;
-import org.json.fh.JSONException;
-import org.json.fh.JSONObject;
-
+import com.feedhenry.sdk2.FHHttpClient;
+import cz.msebera.android.httpclient.Header;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.fh.JSONException;
+import org.json.fh.JSONObject;
 
 /**
  * The request for calling the authentication function.
@@ -58,11 +69,32 @@ public class FHAuthRequest extends FHRemote {
     private OAuthURLRedirectReceiver mReceiver;
 
     protected static String LOG_TAG = "com.feedhenry.sdk.FHAuthRequest";
+    private final com.feedhenry.sdk.api2.FHAuthSession mAuthSession;
 
+    /**
+     * 
+     * @param context The Android application context
+     * @deprecated please use FHActRequest(Context, FHAuthSession) instead
+     */
+    @Deprecated
     public FHAuthRequest(Context context) {
         super(context);
         mPresentingActivity = context;
+        mAuthSession = new com.feedhenry.sdk.api2.FHAuthSession(DataManager.init(context), new FHHttpClient());
     }
+    
+    
+    /**
+     * 
+     * @param context The Android application context
+     * @param pAuthSession an FHAuthSession to store and verify tokens
+     */
+    public FHAuthRequest(Context context, com.feedhenry.sdk.api2.FHAuthSession pAuthSession) {
+        super(context);
+        mPresentingActivity = context;
+        mAuthSession = pAuthSession;
+    }
+
 
     /**
      * Sets the policy ID for this auth request.
@@ -147,7 +179,7 @@ public class FHAuthRequest extends FHRemote {
                                 startAuthIntent(jsonRes, callback);
                             } else {
                                 if (jsonRes.has(FHAuthSession.SESSION_TOKEN_KEY)) {
-                                    FHAuthSession.save(jsonRes.getString(FHAuthSession.SESSION_TOKEN_KEY));
+                                    mAuthSession.save(jsonRes.getString(FHAuthSession.SESSION_TOKEN_KEY));
                                 }
                                 callback.success(pResponse);
                             }
@@ -185,7 +217,7 @@ public class FHAuthRequest extends FHRemote {
                                 startAuthIntent(jsonRes, callback);
                             } else {
                                 if (jsonRes.has(FHAuthSession.SESSION_TOKEN_KEY)) {
-                                    FHAuthSession.save(jsonRes.getString(FHAuthSession.SESSION_TOKEN_KEY));
+                                    mAuthSession.save(jsonRes.getString(FHAuthSession.SESSION_TOKEN_KEY));
                                 }
                                 callback.success(pResponse);
                             }
@@ -238,6 +270,7 @@ public class FHAuthRequest extends FHRemote {
                 mCallback.fail(res);
             } else {
                 if (data.contains("status=complete")) {
+                    data = data.split("#")[0];//Remove everything after an anchor
                     String query = data.split("\\?")[1];
                     String[] parts = query.split("&");
                     Map<String, String> queryMap = new HashMap<String, String>();
@@ -251,14 +284,16 @@ public class FHAuthRequest extends FHRemote {
                         try {
                             String sessionToken = queryMap.get("fh_auth_session");
                             if (sessionToken != null) {
-                                FHAuthSession.save(sessionToken);
+                                mAuthSession.save(sessionToken);
                             }
                             resJson.put(FHAuthSession.SESSION_TOKEN_KEY, sessionToken);
                             resJson.put(
                                 "authResponse",
-                                new JSONObject(URLDecoder.decode(queryMap.get("authResponse"))));
+                                new JSONObject(URLDecoder.decode(queryMap.get("authResponse"), "UTF-8")));
                             res = new FHResponse(resJson, null, null, null);
                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
                         mPresentingActivity.unregisterReceiver(this);

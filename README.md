@@ -7,7 +7,7 @@ This SDK should provide you with all you'll need to start developing cloud-conne
 
 ### Prereqs
 
-* [Java 6](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+* [Java 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 * [Maven 3.1.1](http://maven.apache.org/)
 * Latest [Android SDK](https://developer.android.com/sdk/index.html) and [Platform version](http://developer.android.com/tools/revisions/platforms.html)
 * Latest [Maven Android SDK Deployer](https://github.com/mosabua/maven-android-sdk-deployer)
@@ -45,29 +45,35 @@ Until we don't have it released in Maven Central we are hosting it in a [Github 
 
 To deploy it, you need to follow the instructions below:
 
-For create snapshots
+### Snapshots
 
 ```shell
-mvn -DaltDeploymentRepository=snapshot-repo:default::file:[your repo dir]/snapshots clean deploy
+mvn -DaltDeploymentRepository=snapshot-repo::default::file:[your repo dir]/snapshots clean deploy
 ```
 
-For create releases
+### Releases
 
 ```shell
-mvn -DaltDeploymentRepository=releases-repo:default::file:[your repo dir]/releases clean deploy
+mvn -DaltDeploymentRepository=releases-repo::default::file:[your repo dir]/releases clean deploy
 ```
 
 After that, commit it in the [fh-android-sdk-repository](https://github.com/feedhenry/fh-android-sdk-repository) and send a PR on it
 
 ## Usage
 
-Add our Github host repo in your `gradle.build` project
+### Gradle Projects (Recommended)
+
+Add our Github host repo in your `gradle.build` project file
+
 
 ```
 allprojects {
 	repositories {
    	jcenter()
-		maven { url "https://github.com/danielpassos/fh-android-sdk-repository/raw/master/releases" }
+   		// for snapshots
+		maven { url "https://github.com/feedhenry/fh-android-sdk-repository/raw/master/snapshots" }
+		// for released
+		maven { url "https://github.com/feedhenry/fh-android-sdk-repository/raw/master/releases" }
 	}
 }
 ```
@@ -81,6 +87,14 @@ dependencies {
 ```
 
 For more detail about our API, See [FH Android SDK Guide](http://docs.feedhenry.com/v3/dev_tools/sdks/android.html).
+
+### Ant Projects
+
+To use the Android SDK in Ant-based Android projects, the following files need to be added as the dependencies:
+
+* The fh-android-sdk jar file (e.g. [2.3.1 Jar File](https://github.com/feedhenry/fh-android-sdk-repository/blob/master/releases/com/feedhenry/fh-android-sdk/2.3.1/))
+* All the jar files in the [deps](./deps) directory
+
 
 ## Example
 

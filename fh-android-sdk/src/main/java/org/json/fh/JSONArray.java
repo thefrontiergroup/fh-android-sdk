@@ -32,7 +32,9 @@ package org.json.fh;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * A JSONArray is an ordered sequence of values.

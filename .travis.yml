@@ -4,7 +4,6 @@ language: android
 jdk:
   - oraclejdk8
   - oraclejdk7
-  - openjdk6
 
 notifications:
   irc: irc.freenode.org#feedhenry
@@ -17,17 +16,19 @@ android:
   components:
   - platform-tools
   - tools
-  - build-tools-22.0.1
+  - build-tools-23.0.1
   - android-22
+  - android-23
+  - sys-img-armeabi-v7a-android-22
   - extra-google-m2repository
   - extra-android-m2repository
-  - sys-img-armeabi-v7a-android-22
+
 
 env:
   global:
     - RELEASE_VERSION=$(grep "<version>" fh-android-sdk/pom.xml | tr "\n" ":" | cut -d ':' -f1 | sed s/\<version\>//g| sed s/\"//g| sed s/\<\\/version\>//g | tr -d ' ')
   matrix:
-    - ANDROID_SDK=android-22 ANDROID_EMULATOR=android-22 ANDROID_ABI=armeabi-v7a
+    - ANDROID_SDK=android-23 ANDROID_EMULATOR=android-22 ANDROID_ABI=armeabi-v7a
 
 before_install:
   # Checkout maven-android-sdk-deployer
@@ -35,7 +36,7 @@ before_install:
 
   # Install Android in locally Maven repository
   - cd $PWD/maven-android-sdk-deployer/platforms/$ANDROID_SDK
-  - mvn  install -N --quiet
+  - mvn install -N --quiet
   - cd -
 
   # Install locally google-m2repository (including play services aar)
@@ -48,11 +49,11 @@ before_script:
 
 script:
   - set -ev
-  - mvn install -Drelease
+  - mvn clean install -Drelease
   - cd fh-android-sdk-test
-  - mvn package -DskipTests=true;
+  - mvn clean package -DskipTests=true;
   - emulator -avd test -no-skin -no-audio -no-window&
-  - wget https://raw.githubusercontent.com/travis-ci/travis-cookbooks/master/ci_environment/android-sdk/files/default/android-wait-for-emulator
+  - wget https://raw.githubusercontent.com/travis-ci/travis-cookbooks/master/community-cookbooks/android-sdk/files/default/android-wait-for-emulator
   - chmod a+x ./android-wait-for-emulator
   - "./android-wait-for-emulator"
   - adb shell input keyevent 82
