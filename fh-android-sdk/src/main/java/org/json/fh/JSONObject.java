@@ -30,9 +30,7 @@ package org.json.fh;
  SOFTWARE.
  */
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -142,7 +140,7 @@ public class JSONObject implements Serializable {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
-        this.myHashMap = new HashMap<String, Object>();
+        this.myHashMap = new HashMap<>();
     }
 
     /**
@@ -228,7 +226,7 @@ public class JSONObject implements Serializable {
      *            the JSONObject.
      */
     public JSONObject(Map<String, Object> map) {
-        this.myHashMap = map == null ? new HashMap<String, Object>() : new HashMap<String, Object>(map);
+        this.myHashMap = map == null ? new HashMap<String, Object>() : new HashMap<>(map);
     }
 
     /**
@@ -243,7 +241,7 @@ public class JSONObject implements Serializable {
      * @param names  An array of strings, the names of the fields to be used
      *               from the object.
      */
-    public JSONObject(Object object, String names[]) {
+    public JSONObject(Object object, String[] names) {
         this();
         Class<?> c = object.getClass();
         for (String name : names) {
@@ -499,7 +497,7 @@ public class JSONObject implements Serializable {
     // Patched from the latest version of JSONObject from json.org
     // See http://www.json.org/java/org/json/JSONObject.java
     public Iterator<String> sortedKeys() {
-        return new TreeSet<String>(this.myHashMap.keySet()).iterator();
+        return new TreeSet<>(this.myHashMap.keySet()).iterator();
     }
 
     /**
@@ -865,56 +863,72 @@ public class JSONObject implements Serializable {
      * @return A String correctly formatted for insertion in a JSON text.
      */
     public static String quote(String string) {
+        StringWriter sw = new StringWriter();
+        try {
+            return quote(string, sw).toString();
+        } catch (IOException ignored) {
+            // will never happen - we are writing to a string writer
+            return "";
+        }
+    }
+
+    public static Writer quote(String string, Writer w) throws IOException {
         if (string == null || string.isEmpty()) {
-            return "\"\"";
+            w.write("\"\"");
+            return w;
         }
 
+        char b;
         char c = 0;
+        String hhhh;
+        int i;
         int len = string.length();
-        StringBuilder sb = new StringBuilder(len + 4);
 
-        sb.append('"');
-        for (int i = 0; i < len; i++) {
-            char b = c;
+        w.write('"');
+        for (i = 0; i < len; i += 1) {
+            b = c;
             c = string.charAt(i);
             switch (c) {
                 case '\\':
                 case '"':
-                    sb.append('\\');
-                    sb.append(c);
+                    w.write('\\');
+                    w.write(c);
                     break;
                 case '/':
                     if (b == '<') {
-                        sb.append('\\');
+                        w.write('\\');
                     }
-                    sb.append(c);
+                    w.write(c);
                     break;
                 case '\b':
-                    sb.append("\\b");
+                    w.write("\\b");
                     break;
                 case '\t':
-                    sb.append("\\t");
+                    w.write("\\t");
                     break;
                 case '\n':
-                    sb.append("\\n");
+                    w.write("\\n");
                     break;
                 case '\f':
-                    sb.append("\\f");
+                    w.write("\\f");
                     break;
                 case '\r':
-                    sb.append("\\r");
+                    w.write("\\r");
                     break;
                 default:
-                    if (c < ' ') {
-                        String t = "000" + Integer.toHexString(c);
-                        sb.append("\\u").append(t.substring(t.length() - 4));
+                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                        || (c >= '\u2000' && c < '\u2100')) {
+                        w.write("\\u");
+                        hhhh = Integer.toHexString(c);
+                        w.write("0000", 0, 4 - hhhh.length());
+                        w.write(hhhh);
                     } else {
-                        sb.append(c);
+                        w.write(c);
                     }
             }
         }
-        sb.append('"');
-        return sb.toString();
+        w.write('"');
+        return w;
     }
 
     /**
