@@ -226,7 +226,7 @@ public class JSONTokener {
      * @throws JSONException
      */
     public char nextClean() throws JSONException {
-        for (; ; ) {
+        while (true) {
             char c = this.next();
             if (c == 0 || c > ' ') {
                 return c;
@@ -249,7 +249,7 @@ public class JSONTokener {
     public String nextString(char quote) throws JSONException {
         char c;
         StringBuilder sb = new StringBuilder();
-        for (; ; ) {
+        while (true) {
             c = this.next();
             switch (c) {
                 case 0:
@@ -305,7 +305,7 @@ public class JSONTokener {
      */
     public String nextTo(char delimiter) throws JSONException {
         StringBuilder sb = new StringBuilder();
-        for (; ; ) {
+        while (true) {
             char c = this.next();
             if (c == delimiter || c == 0 || c == '\n' || c == '\r') {
                 if (c != 0) {
@@ -327,7 +327,7 @@ public class JSONTokener {
     public String nextTo(String delimiters) throws JSONException {
         char c;
         StringBuilder sb = new StringBuilder();
-        for (; ; ) {
+        while (true) {
             c = this.next();
             if (delimiters.indexOf(c) >= 0 || c == 0 ||
                 c == '\n' || c == '\r') {
@@ -380,7 +380,7 @@ public class JSONTokener {
         this.back();
 
         string = sb.toString().trim();
-        if ("".equals(string)) {
+        if (string.isEmpty()) {
             throw this.syntaxError("Missing value");
         }
         return JSONObject.stringToValue(string);
