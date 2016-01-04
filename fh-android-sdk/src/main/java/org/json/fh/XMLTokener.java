@@ -94,7 +94,7 @@ public class XMLTokener extends JSONTokener {
      *
      * @return A string, or a '&lt;' Character, or null if there is no more
      * source text.
-     * @throws JSONException this will be thrown if there is an error parsing the JSON
+     * @throws JSONException if there is an error parsing the JSON
      */
     public Object nextContent() throws JSONException {
         char c;

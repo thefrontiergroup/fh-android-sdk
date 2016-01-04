@@ -287,7 +287,7 @@ public class XML {
      *
      * @param string The source string.
      * @return A JSONObject containing the structured data from the XML string.
-     * @throws JSONException this will be thrown if there is an error parsing the JSON
+     * @throws JSONException if there is an error parsing the JSON
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
         JSONObject o = new JSONObject();
@@ -304,7 +304,7 @@ public class XML {
      *
      * @param o A JSONObject.
      * @return A string.
-     * @throws JSONException this will be thrown if there is an error parsing the JSON
+     * @throws JSONException if there is an error parsing the JSON
      */
     public static String toString(Object o) throws JSONException {
         return toString(o, null);
@@ -316,7 +316,7 @@ public class XML {
      * @param o       A JSONObject.
      * @param tagName The optional name of the enclosing tag.
      * @return A string.
-     * @throws JSONException this will be thrown if there is an error parsing the JSON38
+     * @throws JSONException if there is an error parsing the JSON
      */
     public static String toString(Object o, String tagName) throws JSONException {
         StringBuilder b = new StringBuilder();
