@@ -53,7 +53,7 @@ public class HTTPTokener extends JSONTokener {
      * This is used in parsing HTTP headers.
      *
      * @return A String.
-     * @throws JSONException this will be thrown if there is an error parsing the JSON
+     * @throws JSONException if there is an error parsing the JSON
      */
     public String nextToken() throws JSONException {
         char c;

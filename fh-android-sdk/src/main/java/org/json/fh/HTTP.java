@@ -153,7 +153,7 @@ public class HTTP {
      *
      * @param o A JSONObject
      * @return An HTTP header string.
-     * @throws JSONException if there is an error parsing the JSON if the object does not contain
+     * @throws JSONException if there is an error parsing the JSON or if the object does not contain
      *                       enough information.
      */
     public static String toString(JSONObject o) throws JSONException {

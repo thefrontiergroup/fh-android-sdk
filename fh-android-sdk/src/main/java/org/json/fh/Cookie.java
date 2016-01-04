@@ -83,7 +83,7 @@ public class Cookie {
      * @param string The cookie specification string.
      * @return A JSONObject containing "name", "value", and possibly other
      * members.
-     * @throws JSONException this will be thrown if there is an error parsing the JSON
+     * @throws JSONException if there is an error parsing the JSON
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
         JSONObject o = new JSONObject();
@@ -119,7 +119,7 @@ public class Cookie {
      *
      * @param o A JSONObject
      * @return A cookie specification string
-     * @throws JSONException this will be thrown if there is an error parsing the JSON
+     * @throws JSONException if there is an error parsing the JSON
      */
     public static String toString(JSONObject o) throws JSONException {
         StringBuilder sb = new StringBuilder();

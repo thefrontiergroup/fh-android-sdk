@@ -58,12 +58,12 @@ public class CDL {
      * @return The value string, or null if empty.
      * @throws JSONException if there is an error parsing the JSON if the quoted string is badly formed.
      */
-    private static String getValue(JSONTokener x) throws JSONException {
+    private static String getValue(JSONTokener tokener) throws JSONException {
         char c;
         char q;
         StringBuffer sb;
         do {
-            c = x.next();
+            c = tokener.next();
         } while (c == ' ' || c == '\t');
         switch (c) {
             case 0:
@@ -73,22 +73,22 @@ public class CDL {
                 q = c;
                 sb = new StringBuffer();
                 while (true) {
-                    c = x.next();
+                    c = tokener.next();
                     if (c == q) {
                         break;
                     }
                     if (c == 0 || c == '\n' || c == '\r') {
-                        throw x.syntaxError("Missing close quote '" + q + "'.");
+                        throw tokener.syntaxError("Missing close quote '" + q + "'.");
                     }
                     sb.append(c);
                 }
                 return sb.toString();
             case ',':
-                x.back();
+                tokener.back();
                 return "";
             default:
-                x.back();
-                return x.nextTo(',');
+                tokener.back();
+                return tokener.nextTo(',');
         }
     }
 
@@ -218,8 +218,7 @@ public class CDL {
             Object o = ja.opt(i);
             if (o != null) {
                 String s = o.toString();
-                if (!s.isEmpty() && s.contains(",") || s.contains("\n") || s.contains("\r") ||
-                    s.contains(Character.toString((char) 0)) || s.startsWith("\"")) {
+                if (hasSpecialChars(s)) {
                     sb.append('"');
                     int length = s.length();
                     for (int j = 0; j < length; j++) {
@@ -236,6 +235,11 @@ public class CDL {
         }
         sb.append('\n');
         return sb.toString();
+    }
+
+    private static boolean hasSpecialChars(String input) {
+        return !input.isEmpty() && (input.contains(",") || input.contains("\n") || input.contains("\r") ||
+                    input.contains(Character.toString((char) 0)) || input.startsWith("\""));
     }
 
     /**
